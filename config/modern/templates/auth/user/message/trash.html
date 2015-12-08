@@ -1,0 +1,182 @@
+{% extends "auth/user/index.html" %}
+{% load staticfiles %}
+
+{% block main %}
+    <div class="page-inner">
+        <div id="main-wrapper">
+            <div class="row m-t-md">
+                <div class="col-md-12">
+                    <div class="row mailbox-header">
+                        <div class="col-md-2">
+                            <a href='{% url 'message-write' %}' class="btn btn-success btn-block">Написать сообщение</a>
+                        </div>
+                        <div class="col-md-6">
+                            <h2>Корзина</h2>
+                        </div>
+                        <div class="col-md-4">
+                            <form action="#" method="GET">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control input-search"
+                                           placeholder="Поиск...">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-success" type="button">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </span>
+                                </div><!-- Input Group -->
+                            </form>
+                       </div>
+                    </div>
+                </div>
+
+                <!-- Menu -->
+                {% include "auth/user/message/menu.html" %}
+
+                <div class="col-md-10">
+                    <div id="mailbox" class="mailbox-content">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th colspan="1" class="hidden-xs">
+                                    <span><input type="checkbox" class="check-mail-all"></span>
+                                </th>
+                                <th class="text-right" colspan="5">
+                                    <span class="text-muted m-r-sm">Сообщений {{ all_messages | length }} из
+                                        {{ all_messages | length }} </span>
+                                    <a id='refresh' class="btn btn-default m-r-sm" data-toggle="tooltip" data-placement="top"
+                                       title="Refresh">
+                                        <i class="fa fa-refresh"></i>
+                                    </a>
+                                    <div class="btn-group m-r-sm mail-hidden-options">
+                                        <a id='delete' class="btn btn-default" data-toggle="tooltip" data-placement="top"
+                                           title="Удалить">
+                                            <i class="fa fa-trash"></i>
+                                        </a>
+                                    </div>
+                                    <div class="btn-group">
+                                        <a class="btn btn-default"><i class="fa fa-angle-left"></i></a>
+                                        <a class="btn btn-default"><i class="fa fa-angle-right"></i></a>
+                                    </div>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if all_messages %}
+                                {% for mess in all_messages %}
+                                    {% if mess.status == 'N' %}
+                                        <tr class="unread" data-value="{{ mess.id }}">
+                                    {% else %}
+                                        <tr class="read" data-value="{{ mess.id }}">
+                                    {% endif %}
+
+                                        <td class="hidden-xs">
+                                            <span><input type="checkbox" class="checkbox-mail"></span>
+                                        </td>
+
+                                        <!-- Check -->
+                                        <td class="hidden-xs">
+                                            <i class="fa fa-star"></i>
+                                        </td>
+
+                                        <td class="hidden-xs">
+                                            {{ mess.user_send.first_name }} {{ mess.user_send.last_name }}
+                                        </td>
+
+                                        <td>
+                                            {{ mess.message }}
+                                        </td>
+
+                                         <td>
+                                        </td>
+
+                                        <td>
+                                            {{ mess.datetime }}
+                                        </td>
+
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div><!-- Row -->
+    </div><!-- Main Wrapper -->
+
+    <!-- Footer -->
+    {% include "auth/user/base/footer.html" %}
+
+</div><!-- Page Inner -->
+
+    <script type="text/javascript">
+        $( document ).ready(function() {
+            var hiddenMailOptions = function() {
+                if($('.checkbox-mail:checked').length) {
+                    $('.mail-hidden-options').css('display', 'inline-block');
+                } else {
+                    $('.mail-hidden-options').css('display', 'none');
+                };
+            };
+
+            hiddenMailOptions();
+
+            $('.check-mail-all').click(function () {
+                $('.checkbox-mail').click();
+            });
+
+            $('.checkbox-mail').each(function() {
+                $(this).click(function() {
+                    if($(this).closest('tr').hasClass("checked")){
+                        $(this).closest('tr').removeClass('checked');
+                        hiddenMailOptions();
+                    } else {
+                        $(this).closest('tr').addClass('checked');
+                        hiddenMailOptions();
+                    }
+                });
+            });
+
+            $('.mailbox-content table tr td').not(":first-child").on('click', function(e) {
+                var make_url = '{% url 'message-view' message_id=1 %}';
+                var url = make_url.split('/');
+                var value = $(this).parent().attr('data-value');
+                e.preventDefault();
+                window.location = '/' + url[1] + '/' + url[2] + '/' + value;
+            });
+
+
+            /* Delete */
+            $('#delete').click(function() {
+                sendRequest('makeDelete');
+            });
+
+            /* Refresh */
+            $('#refresh').click(function() {
+                window.location = '{% url 'message-send' %}';
+            });
+
+            function sendRequest(title) {
+                $('.checkbox-mail').each(function() {
+                     if($(this).closest('tr').hasClass("checked")){
+                         var value = $(this).closest('tr').attr('data-value');
+                         $.ajax({
+                             type: "POST",
+                             url: "{% url 'messages' %}",
+                             data: {
+                                 'key': title,
+                                 'id': value,
+                                 'csrfmiddlewaretoken': '{{ csrf_token }}'
+                             },
+                             success: function (msg) {}
+                         });
+
+                     }
+                });
+                window.location = '{% url 'message-trash' %}';
+            }
+
+
+        });
+    </script>
+
+{% endblock %}

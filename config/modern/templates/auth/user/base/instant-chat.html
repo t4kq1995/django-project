@@ -1,0 +1,63 @@
+<div class="overlay"></div>
+<!-- Main step -->
+<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s1">
+    <h3>
+        <span class="pull-left">Чат</span>
+        <a href="javascript:void(0);" class="pull-right" id="closeRight">
+            <i class="fa fa-times"></i>
+        </a>
+    </h3>
+    <div class="slimscroll">
+        {% for message in top_message %}
+            {% for mess in message %}
+                <a href="javascript:void(0);" data-value='{{ mess.id }}' class="showRight2">
+                    <img src='{{ mess.image }}' alt="">
+                    <span>{{ mess.username }}
+                        <small>{{ mess.message }}</small>
+                    </span>
+                </a>
+            {% endfor %}
+        {% endfor %}
+    </div>
+</nav>
+
+<!-- Help navigate -->
+<nav class="cbp-spmenu cbp-spmenu-vertical cbp-spmenu-right" id="cbp-spmenu-s2">
+    {% for message in top_message %}
+        {% for mess in message %}
+            <h3>
+                <span class="pull-left">{{ mess.username }}</span>
+                <a href="javascript:void(0);" class="pull-right" id="closeRight2">
+                    <i class="fa fa-angle-right"></i>
+                </a>
+            </h3>
+        {% endfor %}
+    {% endfor %}
+            <div class="slimscroll chat">
+                {% for message in messages %}
+                    {% for mess in message %}
+                        {% if mess.status == '1' %}
+                            <div class="chat-item chat-item-left">
+                                <div class="chat-image">
+                                    <img src='{{ mess.image }}' alt="">
+                                </div>
+                                <div class="chat-message">
+                                    {{ mess.message }}
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="chat-item chat-item-right">
+                                <div class="chat-message">
+                                    {{ mess.message }}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </div>
+    <div class="chat-write">
+        <form class="form-horizontal" action="javascript:void(0);">
+            <input type="text" class="form-control" placeholder="Введите сообщение...">
+        </form>
+    </div>
+</nav>

@@ -1,0 +1,15 @@
+<div class="col-md-2">
+    <ul class="list-unstyled mailbox-nav">
+        <li>
+            <a href='{% url 'messages' %}'>
+                <i class="fa fa-inbox"></i>Входящие
+                {% if message %}
+                    <span class="badge badge-success pull-right">{{ message | length }}</span>
+                {% endif %}
+            </a>
+        </li>
+        <li><a href='{% url 'message-send' %}'><i class="fa fa-sign-out"></i>Отправленные</a></li>
+        <li><a href='{% url 'message-spam' %}'><i class="fa fa-exclamation-circle"></i>Спам</a></li>
+        <li><a href='{% url 'message-trash' %}'><i class="fa fa-trash"></i>Корзина</a></li>
+    </ul>
+</div>

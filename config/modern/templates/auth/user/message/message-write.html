@@ -1,0 +1,172 @@
+{% extends "auth/user/index.html" %}
+{% load staticfiles %}
+
+{% block main %}
+    <div class="page-inner">
+        <div id="main-wrapper">
+            <div class="row m-t-md">
+                <div class="col-md-12">
+                    <div class="row mailbox-header">
+                        <div class="col-md-2">
+                            <a href='#' class="btn btn-success btn-block">Отправленные</a>
+                        </div>
+                        <div class="col-md-6">
+                            <h2>Написать сообщение</h2>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="compose-options">
+                                <div class="pull-right">
+                                    <a href="inbox.html" class="btn btn-danger">
+                                        <i class="fa fa-trash m-r-xs"></i>
+                                        Корзина
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Menu -->
+                {% include "auth/user/message/menu.html" %}
+
+                <div class="col-md-10">
+                    <div class="mailbox-content">
+                        <div class="compose-body">
+                            <form class="form-horizontal">
+                                <div class="form-group">
+                                    <label for="to" class="col-sm-2 control-label">Кому</label>
+                                    <div class="col-sm-10">
+                                        <select id="to" class="js-example-basic-multiple-limit js-states form-control"
+                                                multiple="multiple" tabindex="-1" style="display: none; width: 100%">
+                                            <optgroup label="Пользователи">
+                                                {% for cl in client %}
+                                                    <option value={{ cl.id }}>{{ cl.first_name }}
+                                                        {{ cl.last_name }}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                            <optgroup label="Администрация">
+                                                {% for ad in admin %}
+                                                    <option value={{ ad.id }}>{{ ad.first_name }}
+                                                        {{ ad.last_name }}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="subject" class="col-sm-2 control-label">Тема</label>
+                                    <div class="col-sm-10">
+                                        <input type="text" class="form-control" id="subject">
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="compose-message">
+                            <div class="summernote"></div>
+                        </div>
+                        <div class="compose-options">
+                            <div class="pull-right">
+                                <button type="button" id="send_message" href="#" class="btn btn-success">
+                                    <i class="fa fa-send m-r-xs"></i>
+                                    Отправить
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Row -->
+        </div><!-- Main Wrapper -->
+
+    <!-- Footer -->
+    {% include "auth/user/base/footer.html" %}
+
+</div>
+    <script src='{% static "plugins/select2/js/select2.min.js" %}'></script>
+    <script src='{% static "plugins/toastr/toastr.min.js" %}'></script>
+    <script src='{% static "plugins/summernote-master/summernote.min.js" %}'></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            /* Select2 */
+            $(".js-example-basic-multiple-limit").select2({
+                maximumSelectionLength: 2
+            });
+
+            /* Activate summernote */
+            $('.summernote').summernote({
+	            height: 350
+	        });
+
+            /* Send message */
+            $('#send_message').click(function (e) {
+                var to = $('#to').val();
+                var subject = $('#subject').val();
+                var message = $('.summernote').code();
+                if (to != '' && subject != '' && message != '') {
+                    /* Save message */
+                     $.ajax({
+                         type: "POST",
+                         url: "{% url 'message-write' %}",
+                         data: {
+                             'to[]': to,
+                             'subject': subject,
+                             'message': message,
+                             'csrfmiddlewaretoken': '{{ csrf_token }}'
+                         },
+                         success: function (msg) {
+                             if (msg['success']) {
+
+                                 /* Show notification */
+                                 setTimeout(function () {
+                                     toastr.options = {
+                                        closeButton: true,
+                                        progressBar: true,
+                                        showMethod: 'fadeIn',
+                                        hideMethod: 'fadeOut',
+                                        timeOut: 1500
+                                    };
+                                    toastr.success('Ваше сообщение отправлено', 'Успех');
+                                }, 0);
+
+                                 /* Redirect */
+                                 setTimeout(function () {
+                                     $(location).attr('href', '{% url 'message-send' %}');
+                                 }, 2500);
+
+                             } else {
+
+                                 /* Show notification */
+                                 setTimeout(function () {
+                                     toastr.options = {
+                                        closeButton: true,
+                                        progressBar: true,
+                                        showMethod: 'fadeIn',
+                                        hideMethod: 'fadeOut',
+                                        timeOut: 1500
+                                    };
+                                    toastr.error('При отправке произошла ошибка', 'Ошибка');
+                                }, 0);
+
+                             }
+                         }
+                     });
+                } else {
+
+                    /* Show notification */
+                    setTimeout(function () {
+                        toastr.options = {
+                            closeButton: true,
+                            progressBar: true,
+                            showMethod: 'fadeIn',
+                            hideMethod: 'fadeOut',
+                            timeOut: 1500
+                        };
+                        toastr.error('Пожалуйста заполните все поля', 'Ошибка');
+                    }, 0);
+
+                }
+                e.preventDefault();
+            });
+        });
+    </script>
+
+{% endblock %}

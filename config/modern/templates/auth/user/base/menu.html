@@ -1,0 +1,31 @@
+{% url 'index' as index %}
+<!-- Messages -->
+{% url 'messages' as messages %}
+{% url 'message-view' as view %}
+{% url 'message-write' as write %}
+{% url 'message-send' as send %}
+{% url 'message-spam' as spam %}
+{% url 'message-trash' as trash %}
+
+
+<ul class="menu accordion-menu">
+    <li {% if request.get_full_path == index %} class="active" {% endif %}>
+        <a href='{% url 'index'  %}' class="waves-effect waves-button">
+            <span class="menu-icon glyphicon glyphicon-home"></span>
+            <p>Главная</p>
+        </a>
+    </li>
+     <li {% if request.get_full_path == messages or request.get_full_path == view or request.get_full_path == write or request.get_full_path == send or request.get_full_path == spam or request.get_full_path == trash %} class="droplink open"
+        {% else %} class="droplink" {% endif %}>
+         <a href="#" class="waves-effect waves-button">
+             <span class="menu-icon glyphicon glyphicon-user"></span>
+             <p>Профиль</p>
+             <span class="arrow"></span>
+         </a>
+         <ul class="sub-menu">
+             <li {% if request.get_full_path == messages or request.get_full_path == view or request.get_full_path == write or request.get_full_path == send or request.get_full_path == spam or request.get_full_path == trash %}
+                 class="active" {% endif %}>
+                 <a href='{% url 'messages' %}'>Сообщения</a></li>
+         </ul>
+     </li>
+</ul>

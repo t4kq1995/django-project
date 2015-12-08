@@ -1,0 +1,51 @@
+/* Notification icon */
+.task-icon i {
+    text-align: center;
+    font-size: 14px;
+    margin-left: 0.7px;
+    margin-top: -1.5px;
+}
+
+li.dropdown.open > ul > div > li > ul > li > a > div {
+    margin-top: 1px;
+}
+
+.tasks li a .badge {
+    margin: 6px 5px 0 0;
+    max-width: 85px;
+}
+
+/* All tasks */
+table.dataTable {
+    font-size: 14px;
+}
+
+table.dataTable tbody td.I {
+    color: #12AFCB;
+}
+
+table.dataTable tbody td.D {
+    color: #f25656;
+}
+
+table.dataTable tbody td.S {
+    color: #22BAA0;
+}
+
+/* All messages */
+#mailbox .table{
+    font-size: 12px;
+}
+
+/* Main page Style */
+#example-editable {
+    font-size: 12px;
+}
+
+#example-editable div.editable-buttons button.btn.btn-primary.btn-sm.editable-submit {
+    height: 29px;
+}
+
+#example-editable div.editable-buttons button.btn.btn-default.btn-sm.editable-cancel {
+    height: 29px;
+}

@@ -1,0 +1,67 @@
+{% extends "auth/user/index.html" %}
+{% load staticfiles %}
+
+{% block main %}
+
+    <div class="page-inner">
+        <!-- Page-inner breadcrumb -->
+        {% include "auth/user/base/page-inner.html" %}
+
+        <!-- Main block table -->
+        <div id="main-wrapper">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="panel panel-white">
+                        <div class="panel-heading clearfix">
+                            <h4 class="panel-title">Пользователи проекта</h4>
+                        </div>
+                        <div class="panel-body">
+                           <div class="table-responsive">
+                            <table id="example-editable" class="display table" style="width: 100%; cellspacing: 0;">
+                                <thead>
+                                    <tr>
+                                        <th>Имя / Фамилия</th>
+                                        <th>Логин</th>
+                                        <th>Должность</th>
+                                        <th>Последний вход</th>
+                                    </tr>
+                                </thead>
+                                <tfoot>
+                                    <tr>
+                                        <th>Имя / Фамилия</th>
+                                        <th>Логин</th>
+                                        <th>Должность</th>
+                                        <th>Последний вход</th>
+                                    </tr>
+                                </tfoot>
+                                <tbody>
+                                    {% for user in users %}
+                                        <tr>
+                                            <td><a href="javascript:void(0);">{{ user.name }} {{ user.surname }}</a></td>
+                                            <td><a href="javascript:void(0);">{{ user.login }}</a></td>
+                                            <td><a href="javascript:void(0);">{{ user.status }}</a></td>
+                                            <td><a href="javascript:void(0);">{{ user.date_login }}</a></td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                               </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        {% include "auth/user/base/footer.html" %}
+
+    </div>
+
+    <script src='{% static "plugins/jquery-mockjax-master/jquery.mockjax.js" %}'></script>
+    <script src='{% static "plugins/moment/moment.js" %}'></script>
+    <script src='{% static "plugins/datatables/js/jquery.datatables.min.js" %}'></script>
+    <script src='{% static "plugins/x-editable/bootstrap3-editable/js/bootstrap-editable.js" %}'></script>
+    <script src='{% static "plugins/bootstrap-datepicker/js/bootstrap-datepicker.js" %}'></script>
+    <script src='{% static "js/pages/table-data.js" %}'></script>
+
+{% endblock %}

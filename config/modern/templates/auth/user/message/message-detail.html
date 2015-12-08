@@ -1,0 +1,107 @@
+{% extends "auth/user/index.html" %}
+{% load staticfiles %}
+
+{% block main %}
+    <div class="page-inner">
+        <div id="main-wrapper">
+            <div class="row m-t-md">
+                <div class="col-md-12">
+                    <div class="row mailbox-header">
+                        <div class="col-md-2">
+                            <a href='{% url 'message-write' %}' class="btn btn-success btn-block">Написать сообщение</a>
+                        </div>
+                        <div class="col-md-6">
+                            <h2>{{ detail_mess_top }} сообщение</h2>
+                        </div>
+                        <div class="col-md-4">
+                            <form action="#" method="GET">
+                                <div class="input-group">
+                                    <input type="text" name="search" class="form-control input-search"
+                                           placeholder="Поиск...">
+                                    <span class="input-group-btn">
+                                        <button class="btn btn-success" type="button"><i class="fa fa-search"></i></button>
+                                    </span>
+                                </div><!-- Input Group -->
+                            </form>
+                       </div>
+                    </div>
+                </div>
+
+                <!-- Menu -->
+                {% include "auth/user/message/menu.html" %}
+
+                <div class="col-md-10">
+                    <div class="mailbox-content">
+                        <div class="message-header">
+                            <h3><span>Тема:</span> {{ detail_mess.theme }}</h3>
+                            <p class="message-date">{{ detail_mess.datetime }}</p>
+                        </div>
+                        <div class="message-sender">
+                            <img src='/{{ detail_mess_avatar }}' alt="">
+                            {% if detail_mess_key == '1' %}
+                                <p>{{ detail_mess.user_send.first_name }} {{ detail_mess.user_send.last_name }}
+                                    <span>&lt;{{ detail_mess.user_send.email }}&gt;</span></p>
+                            {% else %}
+                                <p>{{ detail_mess.user_receive.first_name }} {{ detail_mess.user_receive.last_name }}
+                                    <span>&lt;{{ detail_mess.user_receive.email }}&gt;</span></p>
+                            {% endif %}
+                        </div>
+                        <div class="message-content">
+                            <p>
+                                {{ detail_mess_message }}
+                            </p>
+                        </div>
+                        <div class="message-options pull-right">
+                            {% if detail_mess_key == '1' %}
+                            <a id="spam" data-value='{{ detail_mess.id }}' href="#" class="btn btn-default">
+                               <i class="fa fa-exclamation-circle m-r-xs"></i>
+                               Пометить как спам
+                            </a>
+                            <a id="trash" data-value='{{ detail_mess.id }}' href="#" class="btn btn-default">
+                               <i class="fa fa-trash m-r-xs"></i>
+                               Поместить в корзину
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div><!-- Row -->
+        </div><!-- Main Wrapper -->
+
+    <!-- Footer -->
+    {% include "auth/user/base/footer.html" %}
+
+</div><!-- Page Inner -->
+
+    <script type="text/javascript">
+        $('document').ready(function(){
+
+             /* Make spam */
+            $('#spam').click(function() {
+                sendRequest('makeSpam', $(this).attr('data-value'));
+            });
+
+            /* Trash */
+            $('#trash').click(function() {
+                sendRequest('makeTrash', $(this).attr('data-value'));
+            });
+
+
+            function sendRequest(title, value) {
+                 $.ajax({
+                     type: "POST",
+                     url: "{% url 'messages' %}",
+                     data: {
+                         'key': title,
+                         'id': value,
+                         'csrfmiddlewaretoken': '{{ csrf_token }}'
+                     },
+                     success: function (msg) {}
+                 });
+                 window.location = '{% url 'messages' %}';
+            }
+
+        });
+    </script>
+
+{% endblock %}

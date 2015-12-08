@@ -1,0 +1,195 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+
+<!-- Title block -->
+{% block title %}
+    <title>Modern | Страница регистрации</title>
+{% endblock %}
+<!-- End Title Block -->
+
+<!-- Main block -->
+{% block content %}
+<body class="page-register">
+    <main class="page-content">
+        <div class="page-inner">
+            <div id="main-wrapper">
+                <div class="row">
+                    <div class="col-md-3 center">
+                        <div class="login-box">
+                            <a href="index.html" class="logo-name text-lg text-center">Modern</a>
+                            <p class="text-center m-t-md">Создайте новый аккаунт в Modern</p>
+                            <form id="regForm" class="m-t-md" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input id="name" type="text" name="name" class="form-control" placeholder="Ваше имя" required>
+                                </div>
+                                <div class="form-group">
+                                    <input id='surname' type="text" name="surname" class="form-control" placeholder="Ваша фамилия" required>
+                                </div>
+                                <div class="form-group">
+                                    <input id='login' type="text" name="login" class="form-control" placeholder="Ваш логин" required>
+                                </div>
+                                <div class="form-group">
+                                    <input id='email' type="email" name="email" class="form-control" placeholder="Ваш email" required>
+                                </div>
+                                <div class="form-group">
+                                    <input id='password' type="password" name="password" class="form-control" placeholder="Введите пароль" required>
+                                </div>
+                                <button id="send" type="submit" class="btn btn-success btn-block m-t-xs">
+                                    Зарегистрироваться</button>
+                                <p class="text-center m-t-xs text-sm">У Вас уже есть аккаунт?</p>
+                                <a href='{% url 'login' %}' class="btn btn-default btn-block m-t-xs">Войти</a>
+                            </form>
+                            <p class="text-center m-t-xs text-sm">2015 &copy; Modern by t4kq.</p>
+                        </div>
+                    </div>
+                </div><!-- Row -->
+            </div><!-- Main Wrapper -->
+        </div><!-- Page Inner -->
+    </main><!-- Page Content -->
+</body>
+
+    <!-- Javascript -->
+    <script src='{% static "plugins/toastr/toastr.min.js" %}'></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+            /* Formvalidation */
+            $('#regForm').formValidation({
+                message: 'Данное значение не валидно',
+                icon: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    login: {
+                        validators: {
+                            stringLength: {
+                                min: 6,
+                                max: 30,
+                                message: 'Поле логин должно быть больше 6 и меньше 30 символов'
+                            }
+                        }
+                    },
+                    email: {
+                        validators: {
+                            emailAddress: {
+                                message: 'Вы ввели не верный email'
+                            }
+                        }
+                    },
+                    password: {
+                        validators: {
+                            stringLength: {
+                                min: 8,
+                                max: 30,
+                                message: 'Поле пароля должно быть больше 8 и меньше 30 символов'
+                            }
+                        }
+                    }
+                }
+            });
+
+            /* Save user */
+            $('#send').click(function (e) {
+                var name = $('#name').val();
+                var surname = $('#surname').val();
+                var login = $('#login').val();
+                var email = $('#email').val();
+                var password = $('#password').val();
+
+                if (name != '' && surname != '' && login != '' && email !='' && password != '') {
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'signup' %}",
+                        data: {
+                            name: name,
+                            surname: surname,
+                            login: login,
+                            email: email,
+                            password: password,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(msg) {
+                            if (msg['success']) {
+
+                                /* Show notification */
+                                setTimeout(function () {
+                                    toastr.options = {
+                                        closeButton: true,
+                                        progressBar: true,
+                                        showMethod: 'fadeIn',
+                                        hideMethod: 'fadeOut',
+                                        timeOut: 1500
+                                    };
+                                    toastr.success('Ваш личный кабинет успешно создан', 'Успех');
+                                }, 0);
+
+                                /* Login */
+                                 $.ajax({
+                                     type: "POST",
+                                     url: "{% url 'login' %}",
+                                     data: {
+                                         login: login,
+                                         password: password,
+                                         csrfmiddlewaretoken: '{{ csrf_token }}'
+                                     },
+                                     success: function (msg) {
+                                         if (msg['success']) {
+
+                                             /* Redirect */
+                                             setTimeout(function () {
+                                                 $(location).attr('href', '{% url 'index' %}');
+                                             }, 2500);
+
+                                         } else {
+
+                                             /* Redirect */
+                                             setTimeout(function () {
+                                                 $(location).attr('href', '{% url '500' %}');
+                                             }, 2500);
+                                         }
+                                     }
+                                 });
+                            } else {
+
+                                /* Show notification */
+                                setTimeout(function () {
+                                    toastr.options = {
+                                        closeButton: true,
+                                        progressBar: true,
+                                        showMethod: 'fadeIn',
+                                        hideMethod: 'fadeOut',
+                                        timeOut: 1500
+                                    };
+                                    toastr.error('Не удалось создать личный кабинет', 'Ошибка');
+                                }, 0);
+
+                                /* Redirect */
+                                setTimeout(function () {
+                                    $(location).attr('href', '{% url 'check' %}');
+                                }, 2500);
+                            }
+                        }
+                    });
+                } else {
+                    setTimeout(function () {
+                        toastr.options = {
+                            closeButton: true,
+                            progressBar: true,
+                            showMethod: 'fadeIn',
+                            hideMethod: 'fadeOut',
+                            timeOut: 1500
+                        };
+                        toastr.error('Пожалуйста заполните все поля', 'Ошибка');
+                    }, 0);
+                }
+
+                e.preventDefault();
+            });
+
+        });
+    </script>
+
+{% endblock %}

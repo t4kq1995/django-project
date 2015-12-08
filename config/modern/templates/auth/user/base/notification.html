@@ -1,0 +1,90 @@
+<li class="dropdown">
+    <!-- Badge -->
+    <a href="#" class="dropdown-toggle waves-effect waves-button waves-classic"
+       data-toggle="dropdown">
+        {% if notification %}
+            <i class="fa fa-bell"></i>
+            <span id="badge" class="badge badge-success pull-right">{{ notification | length }}</span>
+        {% else %}
+            <i class="fa fa-bell-slash"></i>
+        {% endif %}
+    </a>
+    <!-- List -->
+    <ul class="dropdown-menu title-caret dropdown-lg" role="menu">
+        {% if notification %}
+            <li><p class="drop-title text-center">{{ notification_top }}</p></li>
+            <li class="dropdown-menu-list slimscroll tasks">
+                <ul id="note" class="list-unstyled">
+                    {% for note in notification %}
+                        <li>
+                            <a href="/{{ note.link }}" data-value='{{ note.id }}'>
+                                {% if note.type == 'S' %}
+                                    <div class="task-icon badge badge-success"><i class="fa fa-check-circle"></i></div>
+                                {% elif note.type == 'D' %}
+                                    <div class="task-icon badge badge-danger"><i class="fa fa-minus-circle"></i></div>
+                                {% else %}
+                                    <div class="task-icon badge badge-info"><i class="fa fa-info-circle"></i></div>
+                                {% endif %}
+                                <span class="badge badge-roundless badge-default pull-right">{{ note.datetime }}</span>
+                                <p class="task-details">{{ note.message }}</p>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% else %}
+           <li><p class="drop-title text-center">Все уведомления прочитаны!</p></li>
+        {% endif %}
+        <li class="drop-all"><a href="#" id="all_note" class="text-center">Все уведомления</a></li>
+    </ul>
+</li>
+
+<script type="text/javascript">
+    $(document).ready(function(){
+        /* Fa fa icon click */
+        $('#note').find('li').each(function () {
+            $(this).find('a').click(function(){
+                $.ajax({
+                     type: "POST",
+                     url: "{% url 'index' %}",
+                     data: {
+                         key: 'note',
+                         id: $(this).attr('data-value'),
+                         csrfmiddlewaretoken: '{{ csrf_token }}'
+                     },
+                     success: function(){
+
+                     }
+                 });
+            });
+        });
+
+        /* Show all notes */
+        $('#all_note').click(function(){
+            $('#modalNote').modal('show');
+            $.ajax({
+                type: "POST",
+                url: "{% url 'index' %}",
+                data: {
+                    key: 'all_note',
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function(msg){
+                    var modalNote = $('#modalNote');
+                    var notes = msg.notes;
+                    var insert = modalNote.find('tbody');
+                    insert.empty();
+                    for (var i = 0; i < notes.length; i++) {
+                        var tr = $('<tr/>');
+                        tr.append('<td>' + (i+1) + '</td>');
+                        tr.append('<td class='+ notes[i]['type'] +'>' + notes[i]['message'] + '</td>');
+                        tr.append('<td>' + notes[i]['datetime'] + '</td>');
+                        tr.append('<td><a href=/' + notes[i]['link'] + '>Перейти</a></td>');
+                        insert.append(tr);
+                    }
+                    $('#noteTable').DataTable();
+                }
+            });
+        });
+    });
+</script>

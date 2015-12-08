@@ -1,0 +1,128 @@
+{% extends "base/base.html" %}
+{% load staticfiles %}
+
+<!-- Title block -->
+{% block title %}
+    <title>Modern | Восстановление пароля</title>
+{% endblock %}
+<!-- End Title Block -->
+
+<!-- Main block -->
+{% block content %}
+<body class="page-forgot">
+    <main class="page-content">
+        <div class="page-inner">
+            <div id="main-wrapper">
+                <div class="row">
+                    <div class="col-md-3 center">
+                        <div class="login-box">
+                            <a href='{% url 'check' %}' class="logo-name text-lg text-center">Modern</a>
+                            <p class="text-center m-t-md">Введите Ваш email и мы вышлем Вам пароль</p>
+                            <form id='forgotForm' class="m-t-md" method="POST">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <input id="email" type="email" name="email" class="form-control" placeholder="Email" required>
+                                </div>
+                                <button id="send" type="submit" class="btn btn-primary btn-block">Подтвердить</button>
+                                <a href='{% url 'check' %}' class="btn btn-default btn-block m-t-md">Назад</a>
+                            </form>
+                            <p class="text-center m-t-xs text-sm">2015 &copy; Modern by t4kq.</p>
+                        </div>
+                    </div>
+                </div><!-- Row -->
+            </div><!-- Main Wrapper -->
+        </div><!-- Page Inner -->
+    </main><!-- Page Content -->
+</body>
+
+    <!-- Javascript -->
+    <script src='{% static "plugins/toastr/toastr.min.js" %}'></script>
+    <script type="text/javascript">
+        $(document).ready(function (){
+
+            /* Formvalidation */
+            $('#forgotForm').formValidation({
+                message: 'Данное значение не валидно',
+                icon: {
+                    valid: 'glyphicon glyphicon-ok',
+                    invalid: 'glyphicon glyphicon-remove',
+                    validating: 'glyphicon glyphicon-refresh'
+                },
+                fields: {
+                    email: {
+                        validators: {
+                            emailAddress: {
+                                message: 'Вы ввели не верный email'
+                            }
+                        }
+                    }
+                }
+            });
+
+            /* Send email */
+            $('#send').click(function(e){
+                var email = $('#email').val();
+                if (email != '') {
+                    /* Send information */
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'forgot' %}",
+                        data: {
+                            email: email,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(msg){
+                            if (msg['success']) {
+
+                                /* Show notification */
+                                setTimeout(function () {
+                                    toastr.options = {
+                                        closeButton: true,
+                                        progressBar: true,
+                                        showMethod: 'fadeIn',
+                                        hideMethod: 'fadeOut',
+                                        timeOut: 1500
+                                    };
+                                    toastr.success('Пароль отправлен на <b>' + email + '</b>', 'Успех');
+                                }, 0);
+
+                            } else {
+
+                                /* Show notification */
+                                setTimeout(function () {
+                                    toastr.options = {
+                                        closeButton: true,
+                                        progressBar: true,
+                                        showMethod: 'fadeIn',
+                                        hideMethod: 'fadeOut',
+                                        timeOut: 1500
+                                    };
+                                    toastr.error('Данный email не обнаружен', 'Ошибка');
+                                }, 0);
+                            }
+
+                            /* Redirect */
+                            setTimeout(function () {
+                                $(location).attr('href', '{% url 'check' %}');
+                            }, 2500);
+                        }
+                    });
+                } else {
+                    setTimeout(function () {
+                        toastr.options = {
+                            closeButton: true,
+                            progressBar: true,
+                            showMethod: 'fadeIn',
+                            hideMethod: 'fadeOut',
+                            timeOut: 1500
+                        };
+                        toastr.error('Пожалуйста заполните поле email', 'Ошибка');
+                    }, 0);
+                }
+                e.preventDefault();
+            });
+
+        });
+    </script>
+
+{% endblock %}

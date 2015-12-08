@@ -1,0 +1,36 @@
+{% extends "base/base.html" %}
+
+<!-- Title block -->
+{% block title %}
+    <title>Modern | Произошла ошибка</title>
+{% endblock %}
+<!-- End Title Block -->
+
+<!-- Main block -->
+{% block content %}
+<body class="page-error">
+    <main class="page-content">
+        <div class="page-inner">
+            <div id="main-wrapper">
+                <div class="row">
+                    <div class="col-md-4 center">
+                        <h1 class="text-xxl text-primary text-center">500</h1>
+                        <div class="details">
+                            <h3>Ошибка ! Что-то пошло не так...</h3>
+                            <p>Мы не можем отобразить страницу, которую Вы ищите или Ваши данные не
+                                являются корректными. Вернитесь <a href='{% url 'check' %}'>назад</a>
+                                или воспользуйтесь поиском.</p>
+                        </div>
+                        <form class="input-group">
+                            <input type="text" class="form-control" placeholder="Поиск">
+                            <span class="input-group-btn">
+                                <button class="btn btn-default"><i class="fa fa-search"></i></button>
+                            </span>
+                        </form>
+                    </div>
+                </div><!-- Row -->
+            </div><!-- Main Wrapper -->
+        </div><!-- Page Inner -->
+    </main><!-- Page Content -->
+</body>
+{% endblock %}

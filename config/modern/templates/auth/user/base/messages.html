@@ -1,0 +1,63 @@
+<li class="dropdown">
+    <!-- Badge -->
+    <a href="#" class="dropdown-toggle waves-effect waves-button waves-classic" data-toggle="dropdown">
+        {% if message %}
+            <i class="fa fa-envelope"></i>
+            <span id="mess_badge" class="badge badge-success pull-right">{{ message | length }}</span>
+        {% else %}
+            <i class="icon-envelope-open"></i>
+        {% endif %}
+    </a>
+    <!-- List -->
+    <ul class="dropdown-menu title-caret dropdown-lg" role="menu">
+        {% if message %}
+            <li><p class="drop-title text-center">{{ message_top }}</p></li>
+            <li class="dropdown-menu-list slimscroll messages">
+                <ul id="mess" class="list-unstyled">
+                    {% for mess in message %}
+                    <li>
+                        <a href='/profile/messages/{{ mess.id }}' data-value='{{ mess.id }}'>
+                            <div class="msg-img">
+                                {% if mess.online_user %}
+                                    <div class="online on"></div>
+                                {% else %}
+                                    <div class="online off"></div>
+                                {% endif %}
+                                <img class="img-circle" src='/{{ mess.avatar }}' alt=""></div>
+                            <p class="msg-name">{{ mess.user_send.first_name }} {{ mess.user_send.last_name }}</p>
+                            <p class="msg-text">{{ mess.message }}</p>
+                            <p class="msg-time">{{ mess.datetime }} назад</p>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% else %}
+            <li><p class="drop-title text-center">Все сообщения прочитаны!</p></li>
+        {% endif %}
+        <li class="drop-all"><a href='{% url 'messages' %}' class="text-center">Все сообщения</a></li>
+    </ul>
+</li>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        /* Fa fa icon click */
+        $('#mess').find('li').each(function () {
+            $(this).find('a').click(function(){
+                var id = $(this).attr('data-value');
+                $.ajax({
+                     type: "POST",
+                     url: "{% url 'message-view' message_id=1 %}",
+                     data: {
+                         key: 'message',
+                         id: id,
+                         csrfmiddlewaretoken: '{{ csrf_token }}'
+                     },
+                     success: function(){
+
+                     }
+                 });
+            });
+        });
+    });
+</script>
